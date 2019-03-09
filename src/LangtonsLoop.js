@@ -7,7 +7,7 @@ class LangtonsLoop extends React.Component {
     this.state = {
       map: null,
       start: false,
-      
+      rectangles: [],
     }
     this.table = this.setTable();
   }
@@ -16,6 +16,7 @@ class LangtonsLoop extends React.Component {
     this.setState({
         map: this.generateMap(),
         start: true,
+        rectangles: [],
     });
 
     this.intervalID = setInterval(
@@ -27,8 +28,9 @@ class LangtonsLoop extends React.Component {
   componentWillUnmount() {
       clearInterval(this.intervalID);
   }
-
+  
   tick() {
+    var new_rectangles = []
     var new_map = new Array(Number(this.props.height));
     for(var i = 0; i < this.props.height; i++) {
       new_map[i] = Array(Number(this.props.width))
@@ -37,12 +39,30 @@ class LangtonsLoop extends React.Component {
     for( i = 0; i < this.props.height; i++) {
       for(var j = 0; j < this.props.width; j++) {
         new_map[i][j] = this.table.get(this.getNeighbors(i, j, this.state.map));
+        new_rectangles.push(
+          <Rect
+              x={j * 10}
+              y={i * 10}
+              width={10}
+              height={10}
+              fill={this.getColor(new_map[i][j])}
+              stroke={'black'}
+              strokeWidth={1}
+          />
+      );
       }
     }
-
     this.setState({
-        map: new_map
+        map: new_map,
+        rectangles: new_rectangles
     });
+  }
+
+  render() {
+    if(this.state.start) {
+      return <div><RenderGame game={this.state.rectangles}/></div>
+    }
+    return <div></div>
   }
 
   setTable() {
@@ -152,12 +172,7 @@ class LangtonsLoop extends React.Component {
     return result.join('');
   }
 
-  render() {
-    if(this.state.start) {
-      return <div><RenderGame game={this.state.map}/></div>
-    }
-    return <div></div>
-  }
+
 
   generateMap() {
 
@@ -315,49 +330,33 @@ class LangtonsLoop extends React.Component {
     return new_map;
   }
 
-  
+  getColor(value) {
+    let color;
+    if(value === 0)
+      color = "rgb(0,0,0)";
+    else if (value === 1)
+      color = "rgb(0,0,255)";
+    else if (value === 2)
+      color = "rgb(255,0,0)";
+    else if (value === 3)
+      color = "rgb(0,255,0)";
+    else if (value === 4)
+      color = "rgb(255,255,0)";
+    else if (value === 5)
+      color = "rgb(255,0,255)";
+    else if (value === 6)
+      color = "rgb(255,255,255)";
+    else if (value === 7)
+      color = "rgb(0,255,255)";
+    return color;
+  }
 }
 
 
 function RenderGame(props) {
-  var rectangles = []
-  for(var i = 0; i < props.game.length; i++) { 
-      for(var j = 0; j < props.game[i].length; j++) { 
-          let color;
-          if(props.game[i][j] === 0)
-            color = "rgb(0,0,0)";
-          else if (props.game[i][j] === 1)
-            color = "rgb(0,0,255)";
-          else if (props.game[i][j] === 2)
-            color = "rgb(255,0,0)";
-          else if (props.game[i][j] === 3)
-            color = "rgb(0,255,0)";
-          else if (props.game[i][j] === 4)
-            color = "rgb(255,255,0)";
-          else if (props.game[i][j] === 5)
-            color = "rgb(255,0,255)";
-          else if (props.game[i][j] === 6)
-            color = "rgb(255,255,255)";
-          else if (props.game[i][j] === 7)
-            color = "rgb(0,255,255)";
-
-          rectangles.push(
-              <Rect
-                  x={j * 10}
-                  y={i * 10}
-                  width={10}
-                  height={10}
-                  fill={color}
-                  stroke={'black'}
-                  strokeWidth={1}
-              />
-          );
-      }
-  }
-
   return(<Stage width={window.innerWidth} height={window.innerHeight}>
               <Layer>
-                  {rectangles}
+                  {props.game}
               </Layer>
           </Stage>)
 }
