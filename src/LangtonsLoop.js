@@ -10,11 +10,15 @@ class LangtonsLoop extends React.Component {
       rectangles: [],
     }
     this.table = this.setTable();
+    this.map1 = this.generateMap();
+    this.map2 = this.generateMap();
+    this.c = 1;
+
   }
 
   componentDidMount() {
     this.setState({
-        map: this.generateMap(),
+        map: this.map1,
         start: true,
         rectangles: [],
     });
@@ -31,14 +35,19 @@ class LangtonsLoop extends React.Component {
   
   tick() {
     var new_rectangles = []
-    var new_map = new Array(Number(this.props.height));
-    for(var i = 0; i < this.props.height; i++) {
-      new_map[i] = Array(Number(this.props.width))
+    let new_map;
+    if(this.c === 1) {
+      new_map = this.map2;
+      this.c = 2
+    } else {
+      new_map = this.map1;
+      this.c = 1;
     }
 
-    for( i = 0; i < this.props.height; i++) {
+    for(var i = 0; i < this.props.height; i++) {
       for(var j = 0; j < this.props.width; j++) {
         new_map[i][j] = this.table.get(this.getNeighbors(i, j, this.state.map));
+        if(new_map[i][j] !== 0) {
         new_rectangles.push(
           <Rect
               x={j * 10}
@@ -50,6 +59,7 @@ class LangtonsLoop extends React.Component {
               strokeWidth={1}
           />
       );
+        }
       }
     }
     this.setState({
@@ -354,7 +364,7 @@ class LangtonsLoop extends React.Component {
 
 
 function RenderGame(props) {
-  return(<Stage width={window.innerWidth} height={window.innerHeight}>
+  return(<Stage width={window.innerWidth} height={window.innerHeight} >
               <Layer>
                   {props.game}
               </Layer>
