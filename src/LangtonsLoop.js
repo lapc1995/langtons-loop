@@ -46,19 +46,26 @@ class LangtonsLoop extends React.Component {
 
     for(var i = 0; i < this.props.height; i++) {
       for(var j = 0; j < this.props.width; j++) {
-        new_map[i][j] = this.table.get(this.getNeighbors(i, j, this.state.map));
+        
+        var s = this.table.get(this.getNeighbors(i, j, this.state.map));
+        if(isNaN(s)|| s === null) {
+          new_map[i][j] = 2;
+        } else {
+          new_map[i][j] = s;
+        }
+
         if(new_map[i][j] !== 0) {
-        new_rectangles.push(
-          <Rect
-              x={j * 10}
-              y={i * 10}
-              width={10}
-              height={10}
-              fill={this.getColor(new_map[i][j])}
-              stroke={'black'}
-              strokeWidth={1}
-          />
-      );
+          new_rectangles.push(
+            <Rect
+                x={j * 10}
+                y={i * 10}
+                width={10}
+                height={10}
+                fill={this.getColor(new_map[i][j])}
+                stroke={'black'}
+                strokeWidth={1}
+            />
+        );
         }
       }
     }
@@ -181,8 +188,6 @@ class LangtonsLoop extends React.Component {
 
     return result.join('');
   }
-
-
 
   generateMap() {
 
